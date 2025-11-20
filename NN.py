@@ -3,19 +3,19 @@ import numpy as np
 import random
 import copy
 
-alphab = 0#0.02
+alphab = 0.02
 db = 1
 alphaw = 0.02
 dw = 1
 alphaac = 0.2
-alpharc = 0#0.01
-alphaan = 0#0.2
+alpharc = 0.01
+alphaan = 0.2
 gensize = 10
 keepsize = 3
 
 
 def act(x):
-  return np.log(1+x)
+  return np.log(1+np.exp(x))
 
 
 class agent:
@@ -70,6 +70,7 @@ class agent:
 
 
   def model(self, inv): #processes the nnet
+    print(self.totn)
     self.a = [0 for i in range(self.totn)]
     self.p = [False for i in range(self.totn)]
     for i in range(self.inn):
@@ -87,7 +88,7 @@ class agent:
       if np.random.rand() < alphab:
         self.b[i] += np.random.rand()*2*db-db
     for i in range(len(self.w)): #weights and removing connections
-      for j in range(len(self.w[i])):
+      for j in range(len(self.w[i])-1,0,-1):
         if np.random.rand() < alphaw:
           self.w[i][j][1] += np.random.rand()*2*dw-dw
         if np.random.rand() < alpharc:
@@ -114,6 +115,7 @@ class agent:
           self.w[a].remove([b, c])
           break
     if np.random.rand() < alphaan and self.totn-self.outn-1 >= 0: #add nodes
+      #print("node")
       a = random.randint(0, self.totn-self.outn-1)
       if a >= self.inn:
         a += self.outn
@@ -130,7 +132,7 @@ class agent:
       self.w[self.totn-1].append([b, c2])
       if self.d[b] == []:
         self.i.remove(b)
-      self.d[b].append(a)
+      self.d[b].append(self.totn-1)
       self.model([0 for i in range(self.inn)])
       for i in range(self.inn, self.inn + self.outn):
         if not self.p[i]:
@@ -144,21 +146,22 @@ class agent:
           self.totn -= 1
           break
 gn = 0
-gs = [[[0, i, agent(1, 1)] for i in range(gensize)]]
+gs = [[[0, i, agent(2, 1)] for i in range(gensize)]]
 ps = []
 while True:
-  for i in range(gensize):
-    gs[gn][i][0] = gs[gn][i][2].model([1])[0] - gs[gn][i][2].model([-1])[0]
-  gs[gn] = sorted(gs[gn], reverse=True)
-  print(gs[gn])
-  ps.append([])
-  for i in range(gensize):
-    ps[gn].append(gs[gn][i][0])
-  print(ps[gn])
-  if(input("END? ") == "y"):
-    break
-  gs.append(gs[gn])
-  for i in range(keepsize, gensize):
-    gs[gn+1][i] = [0, gs[gn][i][1], copy.deepcopy(gs[gn][random.randint(0, gensize-1)][2])]
-    gs[gn+1][i][2].mutate()
-  gn += 1
+  for _ in range(100):
+    for i in range(gensize):
+      gs[gn][i][0] = gs[gn][i][2].model([1,1])[0] - gs[gn][i][2].model([-1,1])[0] - gs[gn][i][2].model([1,-1])[0] + gs[gn][i][2].model([-1,-1])[0]
+    gs[gn] = sorted(gs[gn], reverse=True)
+    #print(gs[gn])
+    ps.append([])
+    for i in range(gensize):
+      ps[gn].append(gs[gn][i][0])
+    print(ps[gn])
+    gs.append(gs[gn])
+    for i in range(keepsize, gensize):
+      gs[gn+1][i] = [0, gs[gn][i][1], copy.deepcopy(gs[gn][random.randint(0, gensize-1)][2])]
+      gs[gn+1][i][2].mutate()
+    gn += 1
+  #if(input("END? ") == "y"):
+  break
