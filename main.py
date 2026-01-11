@@ -6,11 +6,11 @@
 # a - steer left
 # d - steer right
 # x - move backward to get unstuck
-# r - respawn at start at next generation
+# r - respawn at start at the start of next generation
 # t - restart ai for showcase (also allows respawn at next generation) note the ai can only drive counter-clockwise on the current tracks, so you may need to respawn multiple times to get it going the right way.
 
 # when training the ai, use q and e to decrease and increase the maximum generation age respectively.
-# note, the program already increases the max age by 1000 every generation, so these controls are only needed if you want to speed up or slow down the age increase.
+# note, the program already increases the max age by 1000 every 10 generations, so these controls are only needed if you want to speed up or slow down the age increase.
 
 # when showcasing the ai, use y to set the generation age to unlimited, allowing the ai to drive indefinitely without restarting.
 
